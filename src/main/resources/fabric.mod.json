@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "id": "elytraautoflight",
+  "id": "elytraautopilot",
   "version": "${version}",
 
-  "name": "Elytra Auto Flight",
-  "description": "This mod will fly your elytra wings for you, and will gain altitude without the use of fireworks. ",
+  "name": "Elytra AutoPilot",
+  "description": "Automatic elytra flight without the use of fireworks",
   "authors": [
-    "LouisLOurson"
+    "LouisLOurson (Fork by TheMegax)"
   ],
   "contact": {
     "homepage": "https://github.com/simonlourson/fabric-elytra-auto-flight",
@@ -14,22 +14,22 @@
   },
 
   "license": "CC0-1.0",
-  "icon": "assets/elytraautoflight/icon.png",
+  "icon": "assets/elytraautopilot/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.elytraautoflight.ElytraAutoFlight"
+      "net.elytraautopilot.ElytraAutoPilot"
     ]
   },
   "mixins": [
-    "elytraautoflight.mixins.json"
+    "elytraautopilot.mixins.json"
   ],
 
   "depends": {
     "fabricloader": ">=0.7.4",
     "fabric": "*",
-    "minecraft": "1.16.x"
+    "minecraft": "1.17"
   },
   "suggests": {
     "flamingo": "*"

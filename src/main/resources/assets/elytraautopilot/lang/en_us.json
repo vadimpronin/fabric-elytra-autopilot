@@ -1,0 +1,19 @@
+{
+  "key.elytraautopilot.toggle": "Toggle AutoPilot / Open Mod Settings",
+  "text.elytraautopilot.gui": "In-Flight Gui",
+  "text.elytraautopilot.flightprofile": "Flight Profile",
+  "text.elytraautopilot.title": "Elytra AutoPilot",
+  "text.elytraautopilot.showgui": "Show GUI",
+  "text.elytraautopilot.guiX": "GUI X offset",
+  "text.elytraautopilot.guiY": "GUI Y offset",
+  "text.elytraautopilot.pullUpAngle": "Going up angle",
+  "text.elytraautopilot.pullDownAngle": "Going down angle",
+  "text.elytraautopilot.pullUpMinVelocity": "Min velocity when going up",
+  "text.elytraautopilot.pullDownMaxVelocity": "Max velocity when going down",
+  "text.elytraautopilot.pullUpSpeed": "Speed to pull up",
+  "text.elytraautopilot.pullDownSpeed": "Speed to pull down",
+  "text.elytraautopilot.maxHeight": "Max height when flying",
+  "text.elytraautopilot.autoLanding": "Land automatically",
+  "text.elytraautopilot.autoLandSpeed": "Landing turning speed",
+  "text.elytraautopilot.turningSpeed": "Mid-flight turning speed"
+}
