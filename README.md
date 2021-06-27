@@ -1,4 +1,4 @@
-# Elytra Auto-Flight 1.17
+# Elytra AutoPilot 1.17
 
 This is a fork of Simonlourson's client auto flight mod, updated for 1.17 and added /flyto command functionality.
 
