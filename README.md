@@ -9,7 +9,7 @@ Press the assigned key (default "R") to enable "Auto Flight". While in Auto Flig
 ## /flyto command
 Syntax: /flyto Xpos Zpos
 
-While in Auto Flight mode, input this command to automatically fly to the set coordinates. When near the location, the mod will try to slow you down by rotating around the target to avoid fall damage. This can be deactivated at any time by turning Auto Flight off or toggled in the config.
+While in Auto Flight mode, input this command to automatically fly to the set coordinates. When near the location, the mod will try to slow you down by rotating around the target to avoid fall damage. This can be deactivated at any time by turning off Auto Flight or with the toggle in the config.
 
 ## License
 
