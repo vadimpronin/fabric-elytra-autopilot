@@ -13,3 +13,5 @@ Press the assigned key (default "R") while flying to enable 'Auto Flight'. While
 >Syntax: */flyto Xpos Zpos*
 
 While in 'Auto Flight' mode, input this command to automatically fly to the set coordinates. When near the location, the mod will try to slow you down by rotating around the target to avoid fall damage. This can be deactivated at any time by turning off Auto Flight or using the toggle in the config.
+
+You can find the published releases [here](https://www.curseforge.com/minecraft/mc-mods/elytra-autopilot)
