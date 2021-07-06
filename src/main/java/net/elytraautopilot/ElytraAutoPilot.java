@@ -1,6 +1,8 @@
 package net.elytraautopilot;
 
 import com.google.gson.Gson;
+import java.io.FileWriter;
+import java.util.Scanner;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
@@ -21,6 +23,7 @@ import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,22 +136,55 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
     {
         Gson gson = new Gson();
         String configString = gson.toJson(config);
-        System.out.println(configString);
+        try {
+            FileWriter writer = new FileWriter(configFile);
+            writer.write(configString);
+            writer.close();
+            System.out.println("Saved settings");
 
+        } catch (IOException e) {
+            System.out.println("Error saving settings!");
+        }
     }
 
     private void loadSettings() {
 
 	    config = new ElytraConfig();
-
+	    if (!configFile.exists() && configFile.getParentFile().mkdirs()){
+            try {
+                if (configFile.createNewFile()) {
+                    System.out.println("Created new config file");
+                }
+            } catch (IOException e) {
+                System.out.println("Unable to load ElytraAutoPilot settings! Using default config");
+            }
+        }
+	    else {
+            try {
+                Scanner scanner = new Scanner(configFile);
+                String output = "";
+                while (scanner.hasNextLine()) {
+                    scanner = new Scanner(configFile);
+                    output = scanner.nextLine();
+                }
+                scanner.close();
+                if (!output.equals("")) {
+                    Gson gson = new Gson();
+                    config = gson.fromJson(output, ElytraConfig.class);
+                    System.out.println("Loaded Settings");
+                }
+                else System.out.println("Unable to load ElytraAutoPilot settings! Using default config");
+            } catch (IOException e) {
+                System.out.println("Unable to load ElytraAutoPilot settings! Using default config");
+            }
+        }
     }
 	private void onTick() {
 		double altitude;
 		_tick++;
 		
         if (minecraftClient == null) minecraftClient = MinecraftClient.getInstance();
-        if (config == null) loadSettings();
-
+        if (config == null)loadSettings();
         if (minecraftClient.player != null) {
 
             if (minecraftClient.player.isFallFlying())
@@ -335,6 +371,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
         }
         else {
             velocityList.clear();
+            previousPosition = null;
         }
     }
 
