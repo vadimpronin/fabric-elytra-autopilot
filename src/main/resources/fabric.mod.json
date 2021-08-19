@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Elytra AutoPilot",
-  "description": "Automatic elytra flight without the use of fireworks",
+  "description": "Automatic elytra flight with minimal use of fireworks",
   "authors": [
     "LouisLOurson (Fork by TheMegax)"
   ],

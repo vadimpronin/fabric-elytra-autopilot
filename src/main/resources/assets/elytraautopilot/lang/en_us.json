@@ -15,5 +15,9 @@
   "text.elytraautopilot.maxHeight": "Max height when flying",
   "text.elytraautopilot.autoLanding": "Land automatically",
   "text.elytraautopilot.autoLandSpeed": "Landing turning speed",
-  "text.elytraautopilot.turningSpeed": "Mid-flight turning speed"
+  "text.elytraautopilot.turningSpeed": "Mid-flight turning speed",
+  "text.elytraautopilot.minHeight": "Minimum height from the ground",
+  "text.elytraautopilot.takeOffPull": "Take-off looking up speed",
+  "text.elytraautopilot.riskyLanding": "Risky landing. Take a nosedive!",
+  "text.elytraautopilot.poweredFlight": "Powered flight. Use fireworks while flying."
 }
