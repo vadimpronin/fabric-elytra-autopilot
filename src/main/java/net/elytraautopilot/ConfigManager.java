@@ -36,6 +36,7 @@ public class ConfigManager {
         ConfigBuilder configBuilder = ConfigBuilder.create().setTitle(new TranslatableText("text.elytraautopilot.title")).setSavingRunnable(ConfigManager::saveSettings);
         ConfigCategory categoryGui = configBuilder.getOrCreateCategory(new TranslatableText("text.elytraautopilot.gui"));
         ConfigCategory categoryFlightProfile = configBuilder.getOrCreateCategory(new TranslatableText(("text.elytraautopilot.flightprofile")));
+        ConfigCategory categoryAdvanced = configBuilder.getOrCreateCategory(new TranslatableText(("text.elytraautopilot.advanced")));
 
         ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
 
@@ -50,6 +51,13 @@ public class ConfigManager {
         categoryFlightProfile.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("text.elytraautopilot.autoLanding"), config.autoLanding).setDefaultValue(config.autoLanding).setSaveConsumer((x) -> config.autoLanding = x).build());
         categoryFlightProfile.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("text.elytraautopilot.riskyLanding"), config.riskyLanding).setDefaultValue(config.riskyLanding).setSaveConsumer((x) -> config.riskyLanding = x).build());
         //categoryFlightProfile.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("text.elytraautopilot.poweredFlight"), config.poweredFlight).setDefaultValue(config.poweredFlight).setSaveConsumer((x) -> config.poweredFlight = x).build());
+
+        categoryAdvanced.addEntry(entryBuilder.startDoubleField(new TranslatableText("text.elytraautopilot.pullUpAngle"), config.pullUpAngle).setDefaultValue(config.pullUpAngle).setSaveConsumer((y) -> config.pullUpAngle = y).build());
+        categoryAdvanced.addEntry(entryBuilder.startDoubleField(new TranslatableText("text.elytraautopilot.pullDownAngle"), config.pullDownAngle).setDefaultValue(config.pullDownAngle).setSaveConsumer((y) -> config.pullDownAngle = y).build());
+        categoryAdvanced.addEntry(entryBuilder.startDoubleField(new TranslatableText("text.elytraautopilot.pullUpSpeed"), config.pullUpSpeed).setDefaultValue(config.pullUpSpeed).setSaveConsumer((y) -> config.pullUpSpeed = y).build());
+        categoryAdvanced.addEntry(entryBuilder.startDoubleField(new TranslatableText("text.elytraautopilot.pullDownSpeed"), config.pullDownSpeed).setDefaultValue(config.pullDownSpeed).setSaveConsumer((y) -> config.pullDownSpeed = y).build());
+        categoryAdvanced.addEntry(entryBuilder.startDoubleField(new TranslatableText("text.elytraautopilot.pullUpMinVelocity"), config.pullUpMinVelocity).setDefaultValue(config.pullUpMinVelocity).setSaveConsumer((y) -> config.pullUpMinVelocity = y).build());
+        categoryAdvanced.addEntry(entryBuilder.startDoubleField(new TranslatableText("text.elytraautopilot.pullDownMaxVelocity"), config.pullDownMaxVelocity).setDefaultValue(config.pullDownMaxVelocity).setSaveConsumer((y) -> config.pullDownMaxVelocity = y).build());
 
         Screen screen = configBuilder.build();
         MinecraftClient.getInstance().setScreen(screen);

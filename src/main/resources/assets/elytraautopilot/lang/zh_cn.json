@@ -1,6 +1,7 @@
 {
   "key.elytraautopilot.toggle": "切换自动飞行 / 打开模组设置",
   "text.elytraautopilot.gui": "飞行中GUI",
+  "text.elytraautopilot.advanced": "先进的",
   "text.elytraautopilot.flightprofile": "飞行配置",
   "text.elytraautopilot.title": "自动化鞘翅飞行",
   "text.elytraautopilot.showgui": "显示GUI",

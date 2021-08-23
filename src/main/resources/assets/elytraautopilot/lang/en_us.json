@@ -1,6 +1,7 @@
 {
   "key.elytraautopilot.toggle": "Toggle AutoPilot / Open Mod Settings",
   "text.elytraautopilot.gui": "In-Flight Gui",
+  "text.elytraautopilot.advanced": "Advanced",
   "text.elytraautopilot.flightprofile": "Flight Profile",
   "text.elytraautopilot.title": "Elytra AutoPilot",
   "text.elytraautopilot.showgui": "Show GUI",
