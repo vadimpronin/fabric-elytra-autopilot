@@ -399,22 +399,22 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
             hudString[0] = (BaseText) new TranslatableText("text.elytraautopilot.hud.toggleAutoFlight")
                     .append(new TranslatableText(autoFlight ? "text.elytraautopilot.hud.true" : "text.elytraautopilot.hud.false"));
 
-            hudString[1] = new TranslatableText("text.elytraautopilot.hud.altitude", altitude);
+            hudString[1] = new TranslatableText("text.elytraautopilot.hud.altitude", String.format("%.2f", altitude));
             hudString[2] = new TranslatableText("text.elytraautopilot.hud.heightFromGround", (groundheight == -1f ? "???" : String.format("%.2f", groundheight)));
 
-            hudString[3] = new TranslatableText("text.elytraautopilot.hud.speed", currentVelocity * 20);
+            hudString[3] = new TranslatableText("text.elytraautopilot.hud.speed", String.format("%.2f", currentVelocity * 20));
             if (avgVelocity == 0f) {
                 hudString[4] = new TranslatableText("text.elytraautopilot.hud.calculating");
                 hudString[5] = new LiteralText("");
             }
             else {
-                hudString[4] = new TranslatableText("text.elytraautopilot.hud.avgSpeed", avgVelocity * 20);
-                hudString[5] = new TranslatableText("text.elytraautopilot.hud.avgHSpeed", avgHorizontalVelocity * 20);
+                hudString[4] = new TranslatableText("text.elytraautopilot.hud.avgSpeed", String.format("%.2f", avgVelocity * 20));
+                hudString[5] = new TranslatableText("text.elytraautopilot.hud.avgHSpeed", String.format("%.2f", avgHorizontalVelocity * 20));
             }
             if (isflytoActive) {
                 hudString[6] = new TranslatableText("text.elytraautopilot.flyto", argXpos, argZpos);
                 if (distance != 0f) {
-                    hudString[7] = new TranslatableText("text.elytraautopilot.hud.eta", (distance/(avgHorizontalVelocity * 20)));
+                    hudString[7] = new TranslatableText("text.elytraautopilot.hud.eta", String.format("%.1f", distance/(avgHorizontalVelocity * 20)));
                 }
                 hudString[8] = (BaseText) new TranslatableText("text.elytraautopilot.hud.autoLand")
                         .append(new TranslatableText(config.autoLanding ? "text.elytraautopilot.hud.enabled" : "text.elytraautopilot.hud.disabled"));
