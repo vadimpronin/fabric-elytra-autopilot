@@ -243,14 +243,14 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
         }
     }
 
-    private void onClientTick() { //20 times a second
+    private void onClientTick() { //20 times a second, before first screen tick
         _tick++;
         double velMod;
 
         if (minecraftClient == null) {
             minecraftClient = MinecraftClient.getInstance();
-            ClientCommands.register(main, minecraftClient);
             ConfigManager.register(main, minecraftClient);
+            ClientCommands.register(main, minecraftClient);
         }
         PlayerEntity player = minecraftClient.player;
 
@@ -258,9 +258,6 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
             autoFlight = false;
             onTakeoff = false;
             return;
-        }
-        if (config == null){
-            ConfigManager.loadSettings(main);
         }
 
         if (player.isFallFlying())
