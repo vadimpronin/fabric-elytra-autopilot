@@ -3,7 +3,7 @@ package net.elytraautopilot;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 public class ClientCommands {
@@ -22,12 +22,12 @@ public class ClientCommands {
                                                     main.argXpos = IntegerArgumentType.getInteger(context, "X");
                                                     main.argZpos = IntegerArgumentType.getInteger(context, "Z");
                                                     main.isflytoActive = true;
-                                                    context.getSource().sendFeedback(new LiteralText("Flying to " + main.argXpos + ", " + main.argZpos).formatted(Formatting.GREEN));
+                                                    context.getSource().sendFeedback(new TranslatableText("text.elytraautopilot.flyto", main.argXpos, main.argZpos).formatted(Formatting.GREEN));
                                                 } else {
-                                                    minecraftClient.player.sendMessage(new LiteralText("You're too low to activate auto-flight!").formatted(Formatting.RED), true);
+                                                    minecraftClient.player.sendMessage(new TranslatableText("text.elytraautopilot.autoFlightFail.tooLow").formatted(Formatting.RED), true);
                                                 }
                                             } else {
-                                                minecraftClient.player.sendMessage(new LiteralText("Start flying to activate fly-to").formatted(Formatting.RED), true);
+                                                minecraftClient.player.sendMessage(new TranslatableText("text.elytraautopilot.flytoFail.flyingRequired").formatted(Formatting.RED), true);
                                             }
                                             return 1;
                                         }))));
