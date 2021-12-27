@@ -85,6 +85,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
         HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> ElytraAutoPilot.this.onScreenTick());
         ClientTickEvents.END_CLIENT_TICK.register(e -> this.onClientTick());
         ElytraAutoPilot.instance = this;
+        initConfig();
 	}
 	public void takeoff()
     {
@@ -156,12 +157,12 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
             else minecraftClient.options.keyUse.setPressed(currentVelocity < 0.75f && player.getPitch() == -90f);
         }
     }
-
-	private void onScreenTick() { //Once every screen frame
-        //Fps adaptation
+	private void onScreenTick() //Once every screen frame
+    {
+        //Fps adaptation (not perfect but works nicely most of the time)
         float fps_delta = minecraftClient.getLastFrameDuration();
         float fps_result = 20/fps_delta;
-        double speedMod = 60/fps_result;
+        double speedMod = 60/fps_result; //Adapt to base 60 FPS
 
         if (minecraftClient.isPaused() && minecraftClient.isInSingleplayer()) return;
         PlayerEntity player = minecraftClient.player;
@@ -188,15 +189,15 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                     }
                     isDescending = true;
                     if (config.riskyLanding && groundheight > 60) {
-                        pitch = player.getPitch();
-                        player.setPitch((float) (pitch + config.takeOffPull*speedMod));
-                        pitch = player.getPitch();
-                        if (pitch > 90f) player.setPitch(90f);
+                        if (currentVelocityHorizontal > 0.3f || currentVelocity > 1.0f){ //TODO make it smoother
+                            smoothLanding(player, speedMod);
+                        }
+                        else{
+                            riskyLanding(player, speedMod);
+                        }
                     }
                     else {
-                        float yaw = MathHelper.wrapDegrees(player.getYaw());
-                        player.setYaw((float) (yaw + config.autoLandSpeed*speedMod));
-                        player.setPitch(30f);
+                        smoothLanding(player, speedMod);
                     }
                 }
                 else {
@@ -243,15 +244,13 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
         }
     }
 
-    private void onClientTick() { //20 times a second, before first screen tick
+    private void onClientTick() //20 times a second, before first screen tick
+    {
         _tick++;
         double velMod;
 
-        if (minecraftClient == null) {
-            minecraftClient = MinecraftClient.getInstance();
-            ConfigManager.register(main, minecraftClient);
-            ClientCommands.register(main, minecraftClient);
-        }
+        initConfig(); //Backup check
+
         PlayerEntity player = minecraftClient.player;
 
         if (player == null){
@@ -450,6 +449,29 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
         }
     }
 
+    private void initConfig()
+    {
+        if (minecraftClient == null) {
+            minecraftClient = MinecraftClient.getInstance();
+            ConfigManager.register(main, minecraftClient);
+            ClientCommands.register(main, config, minecraftClient);
+        }
+    }
+
+    private void smoothLanding(PlayerEntity player, double speedMod)
+    {
+        float yaw = MathHelper.wrapDegrees(player.getYaw());
+        player.setYaw((float) (yaw + config.autoLandSpeed*speedMod));
+        player.setPitch(30f);
+    }
+
+    private void riskyLanding(PlayerEntity player, double speedMod)
+    {
+        float pitch = player.getPitch();
+        player.setPitch((float) (pitch + config.takeOffPull*speedMod));
+        pitch = player.getPitch();
+        if (pitch > 90f) player.setPitch(90f);
+    }
 	@Override
 	public void onInitializeClient() {
         System.out.println("Client ElytraAutoPilot active");

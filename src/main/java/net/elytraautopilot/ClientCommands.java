@@ -7,9 +7,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 public class ClientCommands {
-    public static ElytraConfig config;
-
-    public static void register(ElytraAutoPilot main, MinecraftClient minecraftClient) {
+    public static void register(ElytraAutoPilot main, ElytraConfig config, MinecraftClient minecraftClient) {
         ClientCommandManager.DISPATCHER.register(
                 ClientCommandManager.literal("flyto")
                         .then(ClientCommandManager.argument("X", IntegerArgumentType.integer(-2000000000, 2000000000))
@@ -23,10 +21,12 @@ public class ClientCommands {
                                                     main.argZpos = IntegerArgumentType.getInteger(context, "Z");
                                                     main.isflytoActive = true;
                                                     context.getSource().sendFeedback(new TranslatableText("text.elytraautopilot.flyto", main.argXpos, main.argZpos).formatted(Formatting.GREEN));
-                                                } else {
+                                                }
+                                                else {
                                                     minecraftClient.player.sendMessage(new TranslatableText("text.elytraautopilot.autoFlightFail.tooLow").formatted(Formatting.RED), true);
                                                 }
-                                            } else {
+                                            }
+                                            else {
                                                 minecraftClient.player.sendMessage(new TranslatableText("text.elytraautopilot.flytoFail.flyingRequired").formatted(Formatting.RED), true);
                                             }
                                             return 1;
