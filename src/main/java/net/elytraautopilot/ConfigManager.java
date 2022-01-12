@@ -72,10 +72,10 @@ public class ConfigManager {
             FileWriter writer = new FileWriter(configFile);
             writer.write(configString);
             writer.close();
-            System.out.println("Saved settings");
+            System.out.println("Saved ElytraAutoPilot settings");
 
         } catch (IOException e) {
-            System.out.println("Error saving settings!");
+            System.out.println("Error ElytraAutoPilot saving settings!");
         }
     }
     public static void loadSettings(ElytraAutoPilot main) {
@@ -84,7 +84,7 @@ public class ConfigManager {
         if (!configFile.exists() && configFile.getParentFile().mkdirs()){
             try {
                 if (configFile.createNewFile()) {
-                    System.out.println("Created new config file");
+                    System.out.println("Created new ElytraAutoPilot config file");
                 }
             } catch (IOException e) {
                 System.out.println("Unable to load ElytraAutoPilot settings! Using default config");
@@ -104,7 +104,7 @@ public class ConfigManager {
                 if (!output.equals("")) {
                     Gson gson = new Gson();
                     config = gson.fromJson(output, ElytraConfig.class);
-                    System.out.println("Loaded Settings");
+                    System.out.println("Loaded ElytraAutoPilot Settings");
                 }
                 else System.out.println("Unable to load ElytraAutoPilot settings! Using default config");
             } catch (IOException e) {

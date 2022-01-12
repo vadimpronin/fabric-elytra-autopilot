@@ -321,7 +321,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                 }
             }
             else {
-                // Otherwise we open the settings
+                // Otherwise, we open the settings
                 ConfigManager.createAndShowSettings();
             }
         }
@@ -435,7 +435,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
     {
         Vec3d newPosition;
         PlayerEntity player = minecraftClient.player;
-        if (player != null && !minecraftClient.isPaused() && minecraftClient.isInSingleplayer()) {
+        if (player != null && !(minecraftClient.isPaused() && minecraftClient.isInSingleplayer())) {
             newPosition = player.getPos();
             if (previousPosition == null)
                 previousPosition = newPosition;
