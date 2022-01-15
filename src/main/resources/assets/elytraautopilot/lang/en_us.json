@@ -21,6 +21,7 @@
   "text.elytraautopilot.takeOffPull": "Take-off looking up speed",
   "text.elytraautopilot.riskyLanding": "Risky landing. Take a nosedive!",
   "text.elytraautopilot.poweredFlight": "Powered flight. Use fireworks while flying.",
+  "text.elytraautopilot.elytraHotswap": "Automatically swap elytra when low on durability.",
   "text.elytraautopilot.flyto": "Flying to %d, %d",
   "text.elytraautopilot.flytoFail.flyingRequired": "Start flying to activate fly-to",
   "text.elytraautopilot.takeoffFail.noElytraEquipped": "Equip an elytra to start flying",

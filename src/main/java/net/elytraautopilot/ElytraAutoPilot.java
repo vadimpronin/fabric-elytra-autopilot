@@ -183,7 +183,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
             if (pitch <= -90f) player.setPitch(-90f);
         }
         if (autoFlight) {
-            if (true) { // TODO: add config option
+            if (config.elytraHotswap) {
                 int elytraDurability = player.getInventory().armor.get(2).getMaxDamage() - player.getInventory().armor.get(2).getDamage();
                 if (elytraDurability <= 5) { // Leave some leeway so we don't stop flying
                     // Optimization: find the first elytra with sufficient durability
