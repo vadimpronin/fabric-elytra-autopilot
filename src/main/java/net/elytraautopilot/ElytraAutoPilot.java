@@ -13,6 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.MessageType;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.BaseText;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
@@ -207,6 +208,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                             SlotActionType.SWAP,
                             player
                         );
+                        player.playSound(SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA, 1.0F, 1.0F);
                         player.sendMessage(new TranslatableText("text.elytraautopilot.swappedElytra").formatted(Formatting.GREEN), true);
                     }
                 }
