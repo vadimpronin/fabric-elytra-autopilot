@@ -5,15 +5,20 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.MessageType;
+import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.BaseText;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos;
@@ -178,7 +183,36 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
             }
             if (pitch <= -90f) player.setPitch(-90f);
         }
-        if (autoFlight) { //TODO add elytra hotswap
+        if (autoFlight) {
+            if (config.elytraHotswap) {
+                int elytraDurability = player.getInventory().armor.get(2).getMaxDamage() - player.getInventory().armor.get(2).getDamage();
+                if (elytraDurability <= 5) { // Leave some leeway so we don't stop flying
+                    // Optimization: find the first elytra with sufficient durability
+                    ItemStack newElytra = null;
+                    int minDurability = 10;
+                    for (ItemStack itemStack : player.getInventory().main) {
+                        if (itemStack.getItem().toString().equals("elytra")) {
+                            int itemDurability = itemStack.getMaxDamage() - itemStack.getDamage();
+                            if (itemDurability >= minDurability) {
+                                newElytra = itemStack;
+                                break;
+                            }
+                        }
+                    }
+                    if (newElytra != null) {
+                        int chestSlot = 6;
+                        minecraftClient.interactionManager.clickSlot(
+                            player.playerScreenHandler.syncId,
+                            chestSlot,
+                            player.getInventory().main.indexOf(newElytra),
+                            SlotActionType.SWAP,
+                            player
+                        );
+                        player.playSound(SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA, 1.0F, 1.0F);
+                        player.sendMessage(new TranslatableText("text.elytraautopilot.swappedElytra").formatted(Formatting.GREEN), true);
+                    }
+                }
+            }
             float pitch = player.getPitch();
             if (isflytoActive) {
                 if (isLanding) {

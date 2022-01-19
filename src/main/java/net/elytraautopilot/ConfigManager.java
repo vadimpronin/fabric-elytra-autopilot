@@ -51,6 +51,7 @@ public class ConfigManager {
         categoryFlightProfile.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("text.elytraautopilot.autoLanding"), config.autoLanding).setDefaultValue(config.autoLanding).setSaveConsumer((x) -> config.autoLanding = x).build());
         categoryFlightProfile.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("text.elytraautopilot.riskyLanding"), config.riskyLanding).setDefaultValue(config.riskyLanding).setSaveConsumer((x) -> config.riskyLanding = x).build());
         //categoryFlightProfile.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("text.elytraautopilot.poweredFlight"), config.poweredFlight).setDefaultValue(config.poweredFlight).setSaveConsumer((x) -> config.poweredFlight = x).build());
+        categoryFlightProfile.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("text.elytraautopilot.elytraHotswap"), config.elytraHotswap).setDefaultValue(config.elytraHotswap).setSaveConsumer((x) -> config.elytraHotswap = x).build());
 
         categoryAdvanced.addEntry(entryBuilder.startDoubleField(new TranslatableText("text.elytraautopilot.pullUpAngle"), config.pullUpAngle).setDefaultValue(config.pullUpAngle).setSaveConsumer((y) -> config.pullUpAngle = y).build());
         categoryAdvanced.addEntry(entryBuilder.startDoubleField(new TranslatableText("text.elytraautopilot.pullDownAngle"), config.pullDownAngle).setDefaultValue(config.pullDownAngle).setSaveConsumer((y) -> config.pullDownAngle = y).build());

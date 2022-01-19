@@ -19,4 +19,5 @@ public class ElytraConfig {
     public double takeOffPull = 10;
     public boolean riskyLanding = false;
     public boolean poweredFlight = false;
+    public boolean elytraHotswap = true;
 }
