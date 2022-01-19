@@ -1,11 +1,10 @@
 package net.elytraautopilot;
 
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,12 +17,11 @@ import net.minecraft.text.BaseText;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -154,10 +152,45 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
             Item itemOff = player.getOffHandStack().getItem();
             boolean hasFirework = (itemMain.toString().equals("firework_rocket") || itemOff.toString().equals("firework_rocket"));
             if (!hasFirework){
-                minecraftClient.options.keyUse.setPressed(false);
-                minecraftClient.options.keyJump.setPressed(false);
-                onTakeoff = false;
-                player.sendMessage(new TranslatableText("text.elytraautopilot.takeoffAbort.noFirework").formatted(Formatting.RED), true);
+                if(config.fireworkHotswap){
+                    ItemStack newFirework = null;
+                    for (ItemStack itemStack : player.getInventory().main) {
+                        if (itemStack.getItem().toString().equals("firework_rocket")) {
+                            newFirework = itemStack;
+                            break;
+                        }
+                    }
+                    if (newFirework != null) {
+                        int handSlot;
+                        if (player.getOffHandStack().isEmpty()){
+                            handSlot = 45; //Offhand slot refill
+                        }
+                        else{
+                            handSlot = 36 + player.getInventory().selectedSlot; //Mainhand slot refill
+                        }
+
+                        assert minecraftClient.interactionManager != null;
+                        minecraftClient.interactionManager.clickSlot(
+                                player.playerScreenHandler.syncId,
+                                handSlot,
+                                player.getInventory().main.indexOf(newFirework),
+                                SlotActionType.SWAP,
+                                player
+                        );
+                    }
+                    else{
+                        minecraftClient.options.keyUse.setPressed(false);
+                        minecraftClient.options.keyJump.setPressed(false);
+                        onTakeoff = false;
+                        player.sendMessage(new TranslatableText("text.elytraautopilot.takeoffAbort.noFirework").formatted(Formatting.RED), true);
+                    }
+                }
+                else{
+                    minecraftClient.options.keyUse.setPressed(false);
+                    minecraftClient.options.keyJump.setPressed(false);
+                    onTakeoff = false;
+                    player.sendMessage(new TranslatableText("text.elytraautopilot.takeoffAbort.noFirework").formatted(Formatting.RED), true);
+                }
             }
             else minecraftClient.options.keyUse.setPressed(currentVelocity < 0.75f && player.getPitch() == -90f);
         }
@@ -184,9 +217,10 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
             if (pitch <= -90f) player.setPitch(-90f);
         }
         if (autoFlight) {
+            int elytraDurability = player.getInventory().armor.get(2).getMaxDamage() - player.getInventory().armor.get(2).getDamage();
+            //TODO check if durability is low and no other elytra is available, or if elytra hotswap is deactivated
             if (config.elytraHotswap) {
-                int elytraDurability = player.getInventory().armor.get(2).getMaxDamage() - player.getInventory().armor.get(2).getDamage();
-                if (elytraDurability <= 5) { // Leave some leeway so we don't stop flying
+                if (elytraDurability <= 5) { // Leave some leeway, so we don't stop flying
                     // Optimization: find the first elytra with sufficient durability
                     ItemStack newElytra = null;
                     int minDurability = 10;
@@ -201,6 +235,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                     }
                     if (newElytra != null) {
                         int chestSlot = 6;
+                        assert minecraftClient.interactionManager != null;
                         minecraftClient.interactionManager.clickSlot(
                             player.playerScreenHandler.syncId,
                             chestSlot,

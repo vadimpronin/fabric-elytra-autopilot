@@ -20,4 +20,5 @@ public class ElytraConfig {
     public boolean riskyLanding = false;
     public boolean poweredFlight = false;
     public boolean elytraHotswap = true;
+    public boolean fireworkHotswap = true;
 }
