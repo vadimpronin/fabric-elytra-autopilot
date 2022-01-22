@@ -20,6 +20,7 @@ public class ClientCommands {
                                                     main.argXpos = IntegerArgumentType.getInteger(context, "X");
                                                     main.argZpos = IntegerArgumentType.getInteger(context, "Z");
                                                     main.isflytoActive = true;
+                                                    main.pitchMod = 3f;
                                                     context.getSource().sendFeedback(new TranslatableText("text.elytraautopilot.flyto", main.argXpos, main.argZpos).formatted(Formatting.GREEN));
                                                 }
                                                 else {
@@ -44,6 +45,12 @@ public class ClientCommands {
                                         })))
                         .executes(context -> { //Without coordinates
                             main.takeoff();
+                            return 1;
+                        }));
+        ClientCommandManager.DISPATCHER.register(
+                ClientCommandManager.literal("land")
+                        .executes(context -> {
+                            main.forceLand = true;
                             return 1;
                         }));
     }
