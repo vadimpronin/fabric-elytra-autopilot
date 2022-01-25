@@ -13,6 +13,7 @@
   "text.elytraautopilot.pullDownMaxVelocity": "Velocidad máxima bajando",
   "text.elytraautopilot.pullUpSpeed": "Velocidad de tracción hacia arriba",
   "text.elytraautopilot.pullDownSpeed": "Velocidad de tracción hacia abajo",
+  "text.elytraautopilot.groundCheckTicks": "Ticks antes de checkear por suelo",
   "text.elytraautopilot.maxHeight": "Altura máxima volando",
   "text.elytraautopilot.autoLanding": "Aterrizaje automático",
   "text.elytraautopilot.autoLandSpeed": "Velocidad de giro al aterrizar",

@@ -11,6 +11,7 @@ public class ElytraConfig {
     public double pullDownMaxVelocity = 2.3250866;
     public double pullUpSpeed = 2.1605124;
     public double pullDownSpeed = 0.20545267;
+    public int groundCheckTicks = 4;
     public double maxHeight = 360;
     public boolean autoLanding = true;
     public double autoLandSpeed = 3;

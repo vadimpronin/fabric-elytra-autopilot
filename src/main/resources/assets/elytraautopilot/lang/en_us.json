@@ -13,6 +13,7 @@
   "text.elytraautopilot.pullDownMaxVelocity": "Max velocity when going down",
   "text.elytraautopilot.pullUpSpeed": "Speed to pull up",
   "text.elytraautopilot.pullDownSpeed": "Speed to pull down",
+  "text.elytraautopilot.groundCheckTicks": "Ticks before checking for ground",
   "text.elytraautopilot.maxHeight": "Max height when flying",
   "text.elytraautopilot.autoLanding": "Land automatically",
   "text.elytraautopilot.autoLandSpeed": "Landing turning speed",

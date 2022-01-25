@@ -13,6 +13,7 @@
   "text.elytraautopilot.pullDownMaxVelocity": "最大俯冲速度",
   "text.elytraautopilot.pullUpSpeed": "开始爬升时速度",
   "text.elytraautopilot.pullDownSpeed": "开始俯冲时速度",
+  "text.elytraautopilot.groundCheckTicks": "检查地面之前的蜱虫",
   "text.elytraautopilot.maxHeight": "最大飞行高度",
   "text.elytraautopilot.autoLanding": "自动降落",
   "text.elytraautopilot.autoLandSpeed": "降落时转向速度",

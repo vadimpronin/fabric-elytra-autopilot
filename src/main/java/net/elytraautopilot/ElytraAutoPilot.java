@@ -264,7 +264,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                     }
                     isDescending = true;
                     if (config.riskyLanding && groundheight > 60) {
-                        if (currentVelocityHorizontal > 0.3f || currentVelocity > 1.0f){ //TODO make it smoother
+                        if (currentVelocityHorizontal > 0.3f || currentVelocity > 1.0f){
                             smoothLanding(player, speedMod);
                         }
                         else{
@@ -423,11 +423,11 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
             altitude = player.getPos().y;
             double avgVelocity = 0f;
             double avgHorizontalVelocity = 0f;
-
-            if (_tick >= 10) {
+            int gticks = Math.max(1, config.groundCheckTicks);
+            if (_tick >= gticks) {
                 _index++;
-                if (_index >= 60) _index = 0;
-                if (velocityList.size()< 60) {
+                if (_index >= 1200/gticks) _index = 0;
+                if (velocityList.size()< 1200/gticks) {
                     velocityList.add(currentVelocity);
                     velocityListHorizontal.add(currentVelocityHorizontal);
                 }
@@ -445,7 +445,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                         break;
                     }
                     else {
-                        groundheight = -1f;
+                        groundheight = clientPos.getY();
                     }
                 }
                 _tick = 0;
