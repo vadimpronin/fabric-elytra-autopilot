@@ -1,14 +1,16 @@
 package net.elytraautopilot;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 public class ClientCommands {
     public static void register(ElytraAutoPilot main, ElytraConfig config, MinecraftClient minecraftClient) {
-        ClientCommandManager.DISPATCHER.register(
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            dispatcher.register(
                 ClientCommandManager.literal("flyto")
                         .then(ClientCommandManager.argument("X", IntegerArgumentType.integer(-2000000000, 2000000000))
                                 .then(ClientCommandManager.argument("Z", IntegerArgumentType.integer(-2000000000, 2000000000))
@@ -21,18 +23,21 @@ public class ClientCommands {
                                                     main.argZpos = IntegerArgumentType.getInteger(context, "Z");
                                                     main.isflytoActive = true;
                                                     main.pitchMod = 3f;
-                                                    context.getSource().sendFeedback(new TranslatableText("text.elytraautopilot.flyto", main.argXpos, main.argZpos).formatted(Formatting.GREEN));
+                                                    context.getSource().sendFeedback(Text.translatable("text.elytraautopilot.flyto", main.argXpos, main.argZpos).formatted(Formatting.GREEN));
                                                 }
                                                 else {
-                                                    minecraftClient.player.sendMessage(new TranslatableText("text.elytraautopilot.autoFlightFail.tooLow").formatted(Formatting.RED), true);
+                                                    minecraftClient.player.sendMessage(Text.translatable("text.elytraautopilot.autoFlightFail.tooLow").formatted(Formatting.RED), true);
                                                 }
                                             }
                                             else {
-                                                minecraftClient.player.sendMessage(new TranslatableText("text.elytraautopilot.flytoFail.flyingRequired").formatted(Formatting.RED), true);
+                                                minecraftClient.player.sendMessage(Text.translatable("text.elytraautopilot.flytoFail.flyingRequired").formatted(Formatting.RED), true);
                                             }
                                             return 1;
                                         }))));
-        ClientCommandManager.DISPATCHER.register(
+        });
+
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            dispatcher.register(
                 ClientCommandManager.literal("takeoff")
                         .then(ClientCommandManager.argument("X", IntegerArgumentType.integer(-2000000000, 2000000000))
                                 .then(ClientCommandManager.argument("Z", IntegerArgumentType.integer(-2000000000, 2000000000))
@@ -47,11 +52,16 @@ public class ClientCommands {
                             main.takeoff();
                             return 1;
                         }));
-        ClientCommandManager.DISPATCHER.register(
+        });
+
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            dispatcher.register(
                 ClientCommandManager.literal("land")
                         .executes(context -> {
                             main.forceLand = true;
                             return 1;
                         }));
+        });
+
     }
 }
