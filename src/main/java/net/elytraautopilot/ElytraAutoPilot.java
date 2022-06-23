@@ -10,12 +10,10 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.MessageType;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.BaseText;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -72,7 +70,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
     private List<Double> velocityListHorizontal = new ArrayList<>();
 
 
-    public BaseText[] hudString;
+    public Text[] hudString;
 
 	@Override
 	public void onInitialize() {
@@ -101,16 +99,16 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                 Item itemChest = player.getInventory().armor.get(2).getItem();
                 int elytraDamage = player.getInventory().armor.get(2).getMaxDamage() - player.getInventory().armor.get(2).getDamage();
                 if (!itemChest.toString().equals("elytra")) {
-                    player.sendMessage(new TranslatableText("text.elytraautopilot.takeoffFail.noElytraEquipped").formatted(Formatting.RED), true);
+                    player.sendMessage(Text.translatable("text.elytraautopilot.takeoffFail.noElytraEquipped").formatted(Formatting.RED), true);
                     return;
                 }
                 if (elytraDamage == 1) {
-                    player.sendMessage(new TranslatableText("text.elytraautopilot.takeoffFail.elytraBroken").formatted(Formatting.RED), true);
+                    player.sendMessage(Text.translatable("text.elytraautopilot.takeoffFail.elytraBroken").formatted(Formatting.RED), true);
                     return;
                 }
                 if (!itemMain.toString().equals("firework_rocket")){
                     if (!itemOff.toString().equals("firework_rocket")){
-                        player.sendMessage(new TranslatableText("text.elytraautopilot.takeoffFail.fireworkRequired").formatted(Formatting.RED), true);
+                        player.sendMessage(Text.translatable("text.elytraautopilot.takeoffFail.fireworkRequired").formatted(Formatting.RED), true);
                         return;
                     }
                 }
@@ -124,31 +122,31 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                     BlockPos blockPos = new BlockPos(clientPos.getX(), clientPos.getY() + n, clientPos.getZ());
                     //System.out.println(blockPos);
                     if (!world.getBlockState(blockPos).isAir()) {
-                        player.sendMessage(new TranslatableText("text.elytraautopilot.takeoffFail.clearSkyNeeded").formatted(Formatting.RED), true);
+                        player.sendMessage(Text.translatable("text.elytraautopilot.takeoffFail.clearSkyNeeded").formatted(Formatting.RED), true);
                         return;
                     }
                     n++;
                 }
                 startCooldown = true;
-                minecraftClient.options.keyJump.setPressed(true);
+                minecraftClient.options.jumpKey.setPressed(true);
             }
             return;
         }
         if (player != null) {
             if (groundheight > config.minHeight) {
                 onTakeoff = false;
-                minecraftClient.options.keyUse.setPressed(false);
-                minecraftClient.options.keyJump.setPressed(false);
+                minecraftClient.options.useKey.setPressed(false);
+                minecraftClient.options.jumpKey.setPressed(false);
                 autoFlight = true;
                 pitchMod = 3f;
                 if (isChained) {
                     isflytoActive = true;
                     isChained = false;
-                    minecraftClient.inGameHud.addChatMessage(MessageType.SYSTEM, new TranslatableText("text.elytraautopilot.flyto", argXpos, argZpos).formatted(Formatting.GREEN), player.getUuid());
+                    minecraftClient.inGameHud.getChatHud().addMessage(Text.translatable("text.elytraautopilot.flyto", argXpos, argZpos).formatted(Formatting.GREEN));
                 }
                 return;
             }
-            if (!player.isFallFlying()) minecraftClient.options.keyJump.setPressed(!minecraftClient.options.keyJump.isPressed());
+            if (!player.isFallFlying()) minecraftClient.options.jumpKey.setPressed(!minecraftClient.options.jumpKey.isPressed());
             Item itemMain = player.getMainHandStack().getItem();
             Item itemOff = player.getOffHandStack().getItem();
             boolean hasFirework = (itemMain.toString().equals("firework_rocket") || itemOff.toString().equals("firework_rocket"));
@@ -180,20 +178,20 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                         );
                     }
                     else{
-                        minecraftClient.options.keyUse.setPressed(false);
-                        minecraftClient.options.keyJump.setPressed(false);
+                        minecraftClient.options.useKey.setPressed(false);
+                        minecraftClient.options.jumpKey.setPressed(false);
                         onTakeoff = false;
-                        player.sendMessage(new TranslatableText("text.elytraautopilot.takeoffAbort.noFirework").formatted(Formatting.RED), true);
+                        player.sendMessage(Text.translatable("text.elytraautopilot.takeoffAbort.noFirework").formatted(Formatting.RED), true);
                     }
                 }
                 else{
-                    minecraftClient.options.keyUse.setPressed(false);
-                    minecraftClient.options.keyJump.setPressed(false);
+                    minecraftClient.options.useKey.setPressed(false);
+                    minecraftClient.options.jumpKey.setPressed(false);
                     onTakeoff = false;
-                    player.sendMessage(new TranslatableText("text.elytraautopilot.takeoffAbort.noFirework").formatted(Formatting.RED), true);
+                    player.sendMessage(Text.translatable("text.elytraautopilot.takeoffAbort.noFirework").formatted(Formatting.RED), true);
                 }
             }
-            else minecraftClient.options.keyUse.setPressed(currentVelocity < 0.75f && player.getPitch() == -90f);
+            else minecraftClient.options.useKey.setPressed(currentVelocity < 0.75f && player.getPitch() == -90f);
         }
     }
 	private void onScreenTick() //Once every screen frame
@@ -244,7 +242,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                             player
                         );
                         player.playSound(SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA, 1.0F, 1.0F);
-                        player.sendMessage(new TranslatableText("text.elytraautopilot.swappedElytra").formatted(Formatting.GREEN), true);
+                        player.sendMessage(Text.translatable("text.elytraautopilot.swappedElytra").formatted(Formatting.GREEN), true);
                     }
                     else if (config.emergencyLand){
                         forceLand = true;
@@ -388,7 +386,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
         if(!lastPressed && keyBinding.isPressed()) {
             if (player.isFallFlying()) {
                 if (!autoFlight && groundheight < config.minHeight){
-                    player.sendMessage(new TranslatableText("text.elytraautopilot.autoFlightFail.tooLow").formatted(Formatting.RED), true);
+                    player.sendMessage(Text.translatable("text.elytraautopilot.autoFlightFail.tooLow").formatted(Formatting.RED), true);
                 }
                 else {
                     // If the player is flying an elytra, we start the auto flight
@@ -454,68 +452,68 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                 avgVelocity = velocityList.stream().mapToDouble(val -> val).average().orElse(0.0);
                 avgHorizontalVelocity = velocityListHorizontal.stream().mapToDouble(val -> val).average().orElse(0.0);
             }
-            if (hudString == null) hudString = new BaseText[10];
+            if (hudString == null) hudString = new Text[10];
             if (!config.showgui || minecraftClient.options.debugEnabled) {
-                hudString[0] = new LiteralText("");
-                hudString[1] = new LiteralText("");
-                hudString[2] = new LiteralText("");
-                hudString[3] = new LiteralText("");
-                hudString[4] = new LiteralText("");
-                hudString[5] = new LiteralText("");
-                hudString[6] = new LiteralText("");
-                hudString[7] = new LiteralText("");
-                hudString[8] = new LiteralText("");
-                hudString[9] = new LiteralText("");
+                hudString[0] = Text.of("");
+                hudString[1] = Text.of("");
+                hudString[2] = Text.of("");
+                hudString[3] = Text.of("");
+                hudString[4] = Text.of("");
+                hudString[5] = Text.of("");
+                hudString[6] = Text.of("");
+                hudString[7] = Text.of("");
+                hudString[8] = Text.of("");
+                hudString[9] = Text.of("");
                 return;
             }
-            hudString[0] = (BaseText) new TranslatableText("text.elytraautopilot.hud.toggleAutoFlight")
-                    .append(new TranslatableText(autoFlight ? "text.elytraautopilot.hud.true" : "text.elytraautopilot.hud.false")
+            hudString[0] = Text.translatable("text.elytraautopilot.hud.toggleAutoFlight")
+                    .append(Text.translatable(autoFlight ? "text.elytraautopilot.hud.true" : "text.elytraautopilot.hud.false")
                             .formatted(autoFlight ? Formatting.GREEN : Formatting.RED));
 
-            hudString[1] = (BaseText) new TranslatableText("text.elytraautopilot.hud.altitude", String.format("%.2f", altitude))
+            hudString[1] = Text.translatable("text.elytraautopilot.hud.altitude", String.format("%.2f", altitude))
                     .formatted(Formatting.AQUA);
-            hudString[2] = (BaseText) new TranslatableText("text.elytraautopilot.hud.heightFromGround", (groundheight == -1f ? "???" : String.valueOf(Math.round(groundheight))))
+            hudString[2] = Text.translatable("text.elytraautopilot.hud.heightFromGround", (groundheight == -1f ? "???" : String.valueOf(Math.round(groundheight))))
                     .formatted(Formatting.AQUA);
-            hudString[3] = (BaseText) new TranslatableText("text.elytraautopilot.hud.neededHeight")
+            hudString[3] = Text.translatable("text.elytraautopilot.hud.neededHeight")
                     .formatted(Formatting.AQUA)
-                        .append(new LiteralText(groundheight > config.minHeight ? "Ready" : String.valueOf(Math.round(config.minHeight-groundheight)))
+                        .append(Text.literal(groundheight > config.minHeight ? "Ready" : String.valueOf(Math.round(config.minHeight-groundheight)))
                             .formatted(groundheight > config.minHeight ? Formatting.GREEN : Formatting.RED));
-            hudString[4] = (BaseText) new TranslatableText("text.elytraautopilot.hud.speed", String.format("%.2f", currentVelocity * 20))
+            hudString[4] = Text.translatable("text.elytraautopilot.hud.speed", String.format("%.2f", currentVelocity * 20))
                     .formatted(Formatting.YELLOW);
             if (avgVelocity == 0f) {
-                hudString[5] = (BaseText) new TranslatableText("text.elytraautopilot.hud.calculating")
+                hudString[5] = Text.translatable("text.elytraautopilot.hud.calculating")
                         .formatted(Formatting.WHITE);
-                hudString[6] = new LiteralText("");
+                hudString[6] = Text.of("");
             }
             else {
-                hudString[5] = (BaseText) new TranslatableText("text.elytraautopilot.hud.avgSpeed", String.format("%.2f", avgVelocity * 20))
+                hudString[5] = Text.translatable("text.elytraautopilot.hud.avgSpeed", String.format("%.2f", avgVelocity * 20))
                         .formatted(Formatting.YELLOW);
-                hudString[6] = (BaseText) new TranslatableText("text.elytraautopilot.hud.avgHSpeed", String.format("%.2f", avgHorizontalVelocity * 20))
+                hudString[6] = Text.translatable("text.elytraautopilot.hud.avgHSpeed", String.format("%.2f", avgHorizontalVelocity * 20))
                         .formatted(Formatting.YELLOW);
             }
             if (isflytoActive && !forceLand) {
-                hudString[7] = (BaseText) new TranslatableText("text.elytraautopilot.flyto", argXpos, argZpos)
+                hudString[7] = Text.translatable("text.elytraautopilot.flyto", argXpos, argZpos)
                         .formatted(Formatting.LIGHT_PURPLE);
                 if (distance != 0f) {
-                    hudString[8] = (BaseText) new TranslatableText("text.elytraautopilot.hud.eta", String.valueOf(Math.round(distance/(avgHorizontalVelocity * 20))))
+                    hudString[8] = Text.translatable("text.elytraautopilot.hud.eta", String.valueOf(Math.round(distance/(avgHorizontalVelocity * 20))))
                             .formatted(Formatting.LIGHT_PURPLE);
                 }
-                hudString[9] = (BaseText) new TranslatableText("text.elytraautopilot.hud.autoLand")
+                hudString[9] = Text.translatable("text.elytraautopilot.hud.autoLand")
                         .formatted(Formatting.LIGHT_PURPLE)
-                            .append(new TranslatableText(config.autoLanding ? "text.elytraautopilot.hud.enabled" : "text.elytraautopilot.hud.disabled")
+                            .append(Text.translatable(config.autoLanding ? "text.elytraautopilot.hud.enabled" : "text.elytraautopilot.hud.disabled")
                                 .formatted(config.autoLanding ? Formatting.GREEN : Formatting.RED));
                 if (isLanding) {
-                    hudString[8] = (BaseText) new TranslatableText("text.elytraautopilot.hud.landing")
+                    hudString[8] = Text.translatable("text.elytraautopilot.hud.landing")
                             .formatted(Formatting.LIGHT_PURPLE);
                 }
             }
             else {
-                hudString[7] = new LiteralText("");
-                hudString[8] = new LiteralText("");
-                hudString[9] = new LiteralText("");
+                hudString[7] = Text.of("");
+                hudString[8] = Text.of("");
+                hudString[9] = Text.of("");
             }
             if (forceLand) {
-                hudString[7] = (BaseText) new TranslatableText("text.elytraautopilot.hud.landing")
+                hudString[7] = Text.translatable("text.elytraautopilot.hud.landing")
                         .formatted(Formatting.LIGHT_PURPLE);
             }
         }
