@@ -1,6 +1,7 @@
 package net.elytraautopilot.mixin;
 
 import net.elytraautopilot.ElytraAutoPilot;
+import net.elytraautopilot.config.ModConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
@@ -25,8 +26,8 @@ public class InGameHudMixin {
 			if (elytraAutoPilot.showHud) {
 
 				if (elytraAutoPilot.hudString != null) {
-					float stringX = elytraAutoPilot.config.guiX;
-					float stringY = elytraAutoPilot.config.guiY;
+					float stringX = ModConfig.gui.guiX;
+					float stringY = ModConfig.gui.guiY;
 
 					for (int i = 0; i < elytraAutoPilot.hudString.length; i++) {
 						minecraftClient.textRenderer.drawWithShadow(matrixStack, elytraAutoPilot.hudString[i], stringX, stringY, 0xFFFFFF);

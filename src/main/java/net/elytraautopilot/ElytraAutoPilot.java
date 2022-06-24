@@ -1,16 +1,22 @@
 package net.elytraautopilot;
 
+import com.terraformersmc.modmenu.ModMenu;
+import me.lortseam.completeconfig.gui.ConfigScreenBuilder;
+import me.lortseam.completeconfig.gui.cloth.ClothConfigScreenBuilder;
+import net.elytraautopilot.commands.ClientCommands;
+import net.elytraautopilot.config.ModConfig;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.message.MessageType;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -25,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientModInitializer {
-    public ElytraConfig config;
+    private static final String modid = "elytraautopilot";
     public ElytraAutoPilot main = this;
 
     private static KeyBinding keyBinding;
@@ -74,11 +80,19 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
 
 	@Override
 	public void onInitialize() {
+        String key;
+        if (FabricLoader.getInstance().isModLoaded("cloth-config")) {
+            key = "key." + modid + ".toggle";
+        }
+        else {
+            key = "key." + modid + ".toggle_no_cloth";
+        }
+
 	    keyBinding = new KeyBinding(
-                "key.elytraautopilot.toggle", // The translation key of the keybinding's name
+                key, // The translation key of the keybinding's name
                 InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
                 GLFW.GLFW_KEY_R, // The keycode of the key
-                "text.elytraautopilot.title" // The translation key of the keybinding's category.
+                "config." + modid + ".title" // The translation key of the keybinding's category.
         );
 
         KeyBindingHelper.registerKeyBinding(keyBinding);
@@ -87,7 +101,13 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
         HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> ElytraAutoPilot.this.onScreenTick());
         ClientTickEvents.END_CLIENT_TICK.register(e -> this.onClientTick());
         ElytraAutoPilot.instance = this;
-        initConfig();
+
+        ModConfig config = new ModConfig(modid);
+        config.load();
+        if (FabricLoader.getInstance().isModLoaded("cloth-config")) {
+            ConfigScreenBuilder.setMain(modid, new ClothConfigScreenBuilder());
+        }
+        initCommands();
 	}
 	public void takeoff()
     {
@@ -99,16 +119,16 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                 Item itemChest = player.getInventory().armor.get(2).getItem();
                 int elytraDamage = player.getInventory().armor.get(2).getMaxDamage() - player.getInventory().armor.get(2).getDamage();
                 if (!itemChest.toString().equals("elytra")) {
-                    player.sendMessage(Text.translatable("text.elytraautopilot.takeoffFail.noElytraEquipped").formatted(Formatting.RED), true);
+                    player.sendMessage(Text.translatable("text." + modid + ".takeoffFail.noElytraEquipped").formatted(Formatting.RED), true);
                     return;
                 }
                 if (elytraDamage == 1) {
-                    player.sendMessage(Text.translatable("text.elytraautopilot.takeoffFail.elytraBroken").formatted(Formatting.RED), true);
+                    player.sendMessage(Text.translatable("text." + modid + ".takeoffFail.elytraBroken").formatted(Formatting.RED), true);
                     return;
                 }
                 if (!itemMain.toString().equals("firework_rocket")){
                     if (!itemOff.toString().equals("firework_rocket")){
-                        player.sendMessage(Text.translatable("text.elytraautopilot.takeoffFail.fireworkRequired").formatted(Formatting.RED), true);
+                        player.sendMessage(Text.translatable("text." + modid + ".takeoffFail.fireworkRequired").formatted(Formatting.RED), true);
                         return;
                     }
                 }
@@ -122,7 +142,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                     BlockPos blockPos = new BlockPos(clientPos.getX(), clientPos.getY() + n, clientPos.getZ());
                     //System.out.println(blockPos);
                     if (!world.getBlockState(blockPos).isAir()) {
-                        player.sendMessage(Text.translatable("text.elytraautopilot.takeoffFail.clearSkyNeeded").formatted(Formatting.RED), true);
+                        player.sendMessage(Text.translatable("text." + modid + ".takeoffFail.clearSkyNeeded").formatted(Formatting.RED), true);
                         return;
                     }
                     n++;
@@ -133,7 +153,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
             return;
         }
         if (player != null) {
-            if (groundheight > config.minHeight) {
+            if (groundheight > ModConfig.flightprofile.minHeight) {
                 onTakeoff = false;
                 minecraftClient.options.useKey.setPressed(false);
                 minecraftClient.options.jumpKey.setPressed(false);
@@ -142,7 +162,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                 if (isChained) {
                     isflytoActive = true;
                     isChained = false;
-                    minecraftClient.inGameHud.getChatHud().addMessage(Text.translatable("text.elytraautopilot.flyto", argXpos, argZpos).formatted(Formatting.GREEN));
+                    minecraftClient.inGameHud.getChatHud().addMessage(Text.translatable("text." + modid + ".flyto", argXpos, argZpos).formatted(Formatting.GREEN));
                 }
                 return;
             }
@@ -151,7 +171,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
             Item itemOff = player.getOffHandStack().getItem();
             boolean hasFirework = (itemMain.toString().equals("firework_rocket") || itemOff.toString().equals("firework_rocket"));
             if (!hasFirework){
-                if(config.fireworkHotswap){
+                if(ModConfig.flightprofile.fireworkHotswap){
                     ItemStack newFirework = null;
                     for (ItemStack itemStack : player.getInventory().main) {
                         if (itemStack.getItem().toString().equals("firework_rocket")) {
@@ -181,14 +201,14 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                         minecraftClient.options.useKey.setPressed(false);
                         minecraftClient.options.jumpKey.setPressed(false);
                         onTakeoff = false;
-                        player.sendMessage(Text.translatable("text.elytraautopilot.takeoffAbort.noFirework").formatted(Formatting.RED), true);
+                        player.sendMessage(Text.translatable("text." + modid + ".takeoffAbort.noFirework").formatted(Formatting.RED), true);
                     }
                 }
                 else{
                     minecraftClient.options.useKey.setPressed(false);
                     minecraftClient.options.jumpKey.setPressed(false);
                     onTakeoff = false;
-                    player.sendMessage(Text.translatable("text.elytraautopilot.takeoffAbort.noFirework").formatted(Formatting.RED), true);
+                    player.sendMessage(Text.translatable("text." + modid + ".takeoffAbort.noFirework").formatted(Formatting.RED), true);
                 }
             }
             else minecraftClient.options.useKey.setPressed(currentVelocity < 0.75f && player.getPitch() == -90f);
@@ -211,13 +231,13 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
         if (onTakeoff) {
             float pitch = player.getPitch();
             if (pitch > -90f) {
-                player.setPitch((float) (pitch - config.takeOffPull*speedMod));
+                player.setPitch((float) (pitch - ModConfig.flightprofile.takeOffPull*speedMod));
             }
             if (pitch <= -90f) player.setPitch(-90f);
         }
         if (autoFlight) {
             int elytraDurability = player.getInventory().armor.get(2).getMaxDamage() - player.getInventory().armor.get(2).getDamage();
-            if (config.elytraHotswap) {
+            if (ModConfig.flightprofile.elytraHotswap) {
                 if (elytraDurability <= 5) { // Leave some leeway, so we don't stop flying
                     // Optimization: find the first elytra with sufficient durability
                     ItemStack newElytra = null;
@@ -242,26 +262,26 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                             player
                         );
                         player.playSound(SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA, 1.0F, 1.0F);
-                        player.sendMessage(Text.translatable("text.elytraautopilot.swappedElytra").formatted(Formatting.GREEN), true);
+                        player.sendMessage(Text.translatable("text." + modid + ".swappedElytra").formatted(Formatting.GREEN), true);
                     }
-                    else if (config.emergencyLand){
+                    else if (ModConfig.flightprofile.emergencyLand){
                         forceLand = true;
                     }
                 }
             }
-            else if (elytraDurability <= 30 && config.emergencyLand){
+            else if (elytraDurability <= 30 && ModConfig.flightprofile.emergencyLand){
                 forceLand = true;
             }
             float pitch = player.getPitch();
             if (isflytoActive || forceLand) {
                 if (isLanding || forceLand) {
-                    if (!forceLand && !config.autoLanding){
+                    if (!forceLand && !ModConfig.flightprofile.autoLanding){
                         isflytoActive = false;
                         isLanding = false;
                         return;
                     }
                     isDescending = true;
-                    if (config.riskyLanding && groundheight > 60) {
+                    if (ModConfig.flightprofile.riskyLanding && groundheight > 60) {
                         if (currentVelocityHorizontal > 0.3f || currentVelocity > 1.0f){
                             smoothLanding(player, speedMod);
                         }
@@ -279,10 +299,10 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                     double d = (double) argZpos - playerPosition.z;
                     float targetYaw = MathHelper.wrapDegrees((float) (MathHelper.atan2(d, f) * 57.2957763671875D) - 90.0F);
                     float yaw = MathHelper.wrapDegrees(player.getYaw());
-                    if (Math.abs(yaw-targetYaw) < config.turningSpeed*2*speedMod) player.setYaw(targetYaw);
+                    if (Math.abs(yaw-targetYaw) < ModConfig.flightprofile.turningSpeed*2*speedMod) player.setYaw(targetYaw);
                     else {
-                        if (yaw < targetYaw) player.setYaw((float) (yaw + config.turningSpeed*speedMod));
-                        if (yaw > targetYaw) player.setYaw((float) (yaw - config.turningSpeed*speedMod));
+                        if (yaw < targetYaw) player.setYaw((float) (yaw + ModConfig.flightprofile.turningSpeed*speedMod));
+                        if (yaw > targetYaw) player.setYaw((float) (yaw - ModConfig.flightprofile.turningSpeed*speedMod));
                     }
                     distance = Math.sqrt(f * f + d * d);
                     if (distance < 20) {
@@ -291,17 +311,17 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                 }
             }
             if (pullUp && !(isLanding || forceLand)) { //TODO add powered flight
-            	player.setPitch((float) (pitch - config.pullUpSpeed*speedMod));
+            	player.setPitch((float) (pitch - ModConfig.advanced.pullUpSpeed*speedMod));
             	pitch = player.getPitch();
-                if (pitch <= config.pullUpAngle) {
-                	player.setPitch((float) config.pullUpAngle);
+                if (pitch <= ModConfig.advanced.pullUpAngle) {
+                	player.setPitch((float) ModConfig.advanced.pullUpAngle);
                 }
             }
             if (pullDown && !(isLanding || forceLand)) {
-                player.setPitch((float) (pitch + config.pullDownSpeed*pitchMod*speedMod));
+                player.setPitch((float) (pitch + ModConfig.advanced.pullDownSpeed*pitchMod*speedMod));
                 pitch = player.getPitch();
-                if (pitch >= config.pullDownAngle) {
-                    player.setPitch((float) config.pullDownAngle);
+                if (pitch >= ModConfig.advanced.pullDownAngle) {
+                    player.setPitch((float) ModConfig.advanced.pullDownAngle);
                 }
             }
         }
@@ -322,8 +342,6 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
     {
         if (!(minecraftClient.isPaused() && minecraftClient.isInSingleplayer())) _tick++;
         double velMod;
-
-        initConfig(); //Backup check
 
         PlayerEntity player = minecraftClient.player;
 
@@ -356,14 +374,14 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
             {
                 pullUp = false;
                 pullDown = true;
-                if (altitude > config.maxHeight) { //TODO fix this maybe
+                if (altitude > ModConfig.flightprofile.maxHeight) { //TODO fix this maybe
                     velHigh = 0.3f;
                 }
-                else if (altitude > config.maxHeight-10) {
+                else if (altitude > ModConfig.flightprofile.maxHeight-10) {
                     velLow = 0.28475f;
                 }
                 velMod = Math.max(velHigh, velLow);
-                if (currentVelocity >= config.pullDownMaxVelocity + velMod) {
+                if (currentVelocity >= ModConfig.advanced.pullDownMaxVelocity + velMod) {
                     isDescending = false;
                     pullDown = false;
                     pullUp = true;
@@ -376,7 +394,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                 velLow = 0f;
                 pullUp = true;
                 pullDown = false;
-                if (currentVelocity <= config.pullUpMinVelocity || altitude > config.maxHeight-10) {
+                if (currentVelocity <= ModConfig.advanced.pullUpMinVelocity || altitude > ModConfig.flightprofile.maxHeight-10) {
                     isDescending = true;
                     pullDown = true;
                     pullUp = false;
@@ -385,8 +403,8 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
         }
         if(!lastPressed && keyBinding.isPressed()) {
             if (player.isFallFlying()) {
-                if (!autoFlight && groundheight < config.minHeight){
-                    player.sendMessage(Text.translatable("text.elytraautopilot.autoFlightFail.tooLow").formatted(Formatting.RED), true);
+                if (!autoFlight && groundheight < ModConfig.flightprofile.minHeight){
+                    player.sendMessage(Text.translatable("text." + modid + ".autoFlightFail.tooLow").formatted(Formatting.RED), true);
                 }
                 else {
                     // If the player is flying an elytra, we start the auto flight
@@ -398,8 +416,11 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                 }
             }
             else {
-                // Otherwise, we open the settings
-                ConfigManager.createAndShowSettings();
+                // Otherwise, we open the settings if cloth is loaded
+                if (FabricLoader.getInstance().isModLoaded("cloth-config")) {
+                    Screen configScreen = ModMenu.getConfigScreen(modid, minecraftClient.currentScreen);
+                    minecraftClient.setScreen(configScreen);
+                }
             }
         }
         lastPressed = keyBinding.isPressed();
@@ -421,7 +442,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
             altitude = player.getPos().y;
             double avgVelocity = 0f;
             double avgHorizontalVelocity = 0f;
-            int gticks = Math.max(1, config.groundCheckTicks);
+            int gticks = Math.max(1, ModConfig.advanced.groundCheckTicks);
             if (_tick >= gticks) {
                 _index++;
                 if (_index >= 1200/gticks) _index = 0;
@@ -453,7 +474,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                 avgHorizontalVelocity = velocityListHorizontal.stream().mapToDouble(val -> val).average().orElse(0.0);
             }
             if (hudString == null) hudString = new Text[10];
-            if (!config.showgui || minecraftClient.options.debugEnabled) {
+            if (!ModConfig.gui.showgui || minecraftClient.options.debugEnabled) {
                 hudString[0] = Text.of("");
                 hudString[1] = Text.of("");
                 hudString[2] = Text.of("");
@@ -466,44 +487,44 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                 hudString[9] = Text.of("");
                 return;
             }
-            hudString[0] = Text.translatable("text.elytraautopilot.hud.toggleAutoFlight")
-                    .append(Text.translatable(autoFlight ? "text.elytraautopilot.hud.true" : "text.elytraautopilot.hud.false")
+            hudString[0] = Text.translatable("text." + modid + ".hud.toggleAutoFlight")
+                    .append(Text.translatable(autoFlight ? "text." + modid + ".hud.true" : "text." + modid + ".hud.false")
                             .formatted(autoFlight ? Formatting.GREEN : Formatting.RED));
 
-            hudString[1] = Text.translatable("text.elytraautopilot.hud.altitude", String.format("%.2f", altitude))
+            hudString[1] = Text.translatable("text." + modid + ".hud.altitude", String.format("%.2f", altitude))
                     .formatted(Formatting.AQUA);
-            hudString[2] = Text.translatable("text.elytraautopilot.hud.heightFromGround", (groundheight == -1f ? "???" : String.valueOf(Math.round(groundheight))))
+            hudString[2] = Text.translatable("text." + modid + ".hud.heightFromGround", (groundheight == -1f ? "???" : String.valueOf(Math.round(groundheight))))
                     .formatted(Formatting.AQUA);
-            hudString[3] = Text.translatable("text.elytraautopilot.hud.neededHeight")
+            hudString[3] = Text.translatable("text." + modid + ".hud.neededHeight")
                     .formatted(Formatting.AQUA)
-                        .append(Text.literal(groundheight > config.minHeight ? "Ready" : String.valueOf(Math.round(config.minHeight-groundheight)))
-                            .formatted(groundheight > config.minHeight ? Formatting.GREEN : Formatting.RED));
-            hudString[4] = Text.translatable("text.elytraautopilot.hud.speed", String.format("%.2f", currentVelocity * 20))
+                        .append(Text.literal(groundheight > ModConfig.flightprofile.minHeight ? "Ready" : String.valueOf(Math.round(ModConfig.flightprofile.minHeight-groundheight)))
+                            .formatted(groundheight > ModConfig.flightprofile.minHeight ? Formatting.GREEN : Formatting.RED));
+            hudString[4] = Text.translatable("text." + modid + ".hud.speed", String.format("%.2f", currentVelocity * 20))
                     .formatted(Formatting.YELLOW);
             if (avgVelocity == 0f) {
-                hudString[5] = Text.translatable("text.elytraautopilot.hud.calculating")
+                hudString[5] = Text.translatable("text." + modid + ".hud.calculating")
                         .formatted(Formatting.WHITE);
                 hudString[6] = Text.of("");
             }
             else {
-                hudString[5] = Text.translatable("text.elytraautopilot.hud.avgSpeed", String.format("%.2f", avgVelocity * 20))
+                hudString[5] = Text.translatable("text." + modid + ".hud.avgSpeed", String.format("%.2f", avgVelocity * 20))
                         .formatted(Formatting.YELLOW);
-                hudString[6] = Text.translatable("text.elytraautopilot.hud.avgHSpeed", String.format("%.2f", avgHorizontalVelocity * 20))
+                hudString[6] = Text.translatable("text." + modid + ".hud.avgHSpeed", String.format("%.2f", avgHorizontalVelocity * 20))
                         .formatted(Formatting.YELLOW);
             }
             if (isflytoActive && !forceLand) {
-                hudString[7] = Text.translatable("text.elytraautopilot.flyto", argXpos, argZpos)
+                hudString[7] = Text.translatable("text." + modid + ".flyto", argXpos, argZpos)
                         .formatted(Formatting.LIGHT_PURPLE);
                 if (distance != 0f) {
-                    hudString[8] = Text.translatable("text.elytraautopilot.hud.eta", String.valueOf(Math.round(distance/(avgHorizontalVelocity * 20))))
+                    hudString[8] = Text.translatable("text." + modid + ".hud.eta", String.valueOf(Math.round(distance/(avgHorizontalVelocity * 20))))
                             .formatted(Formatting.LIGHT_PURPLE);
                 }
-                hudString[9] = Text.translatable("text.elytraautopilot.hud.autoLand")
+                hudString[9] = Text.translatable("text." + modid + ".hud.autoLand")
                         .formatted(Formatting.LIGHT_PURPLE)
-                            .append(Text.translatable(config.autoLanding ? "text.elytraautopilot.hud.enabled" : "text.elytraautopilot.hud.disabled")
-                                .formatted(config.autoLanding ? Formatting.GREEN : Formatting.RED));
+                            .append(Text.translatable(ModConfig.flightprofile.autoLanding ? "text." + modid + ".hud.enabled" : "text." + modid + ".hud.disabled")
+                                .formatted(ModConfig.flightprofile.autoLanding ? Formatting.GREEN : Formatting.RED));
                 if (isLanding) {
-                    hudString[8] = Text.translatable("text.elytraautopilot.hud.landing")
+                    hudString[8] = Text.translatable("text." + modid + ".hud.landing")
                             .formatted(Formatting.LIGHT_PURPLE);
                 }
             }
@@ -513,7 +534,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                 hudString[9] = Text.of("");
             }
             if (forceLand) {
-                hudString[7] = Text.translatable("text.elytraautopilot.hud.landing")
+                hudString[7] = Text.translatable("text." + modid + ".hud.landing")
                         .formatted(Formatting.LIGHT_PURPLE);
             }
         }
@@ -542,12 +563,11 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
         }
     }
 
-    private void initConfig()
+    private void initCommands()
     {
         if (minecraftClient == null) {
             minecraftClient = MinecraftClient.getInstance();
-            ConfigManager.register(main, minecraftClient);
-            ClientCommands.register(main, config, minecraftClient);
+            ClientCommands.register(main, minecraftClient);
         }
     }
 
@@ -568,8 +588,8 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
             fallPitch = (float) ((groundheight-20)/30)*20 + fallPitchMin;
         }
         pitchMod = 3f;
-        player.setYaw((float) (yaw + config.autoLandSpeed*speedMod));
-        player.setPitch((float) (pitch + config.pullDownSpeed*pitchMod*speedMod));
+        player.setYaw((float) (yaw + ModConfig.flightprofile.autoLandSpeed*speedMod));
+        player.setPitch((float) (pitch + ModConfig.advanced.pullDownSpeed*pitchMod*speedMod));
         pitch = player.getPitch();
         if (pitch >= fallPitch) {
             player.setPitch(fallPitch);
@@ -579,7 +599,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
     private void riskyLanding(PlayerEntity player, double speedMod)
     {
         float pitch = player.getPitch();
-        player.setPitch((float) (pitch + config.takeOffPull*speedMod));
+        player.setPitch((float) (pitch + ModConfig.flightprofile.takeOffPull*speedMod));
         pitch = player.getPitch();
         if (pitch > 90f) player.setPitch(90f);
     }

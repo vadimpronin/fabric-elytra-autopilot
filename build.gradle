@@ -11,22 +11,35 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-    maven { url "https://maven.shedaniel.me/" }
+	maven {
+		url 'https://jitpack.io'
+	}
+	maven {
+		url "https://maven.terraformersmc.com/"
+	}
+	maven {
+		url "https://maven.shedaniel.me/"
+	}
+	maven {
+		url "https://maven.siphalor.de/"
+	}
 }
 
 dependencies {
+	implementation 'org.projectlombok:lombok:1.18.22'
+
 	//to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modApi("me.shedaniel.cloth:cloth-config-fabric:${project.clothconfig_version}") {
-        exclude(group: "net.fabricmc.fabric-api")
-	}
-	include "me.shedaniel.cloth:cloth-config-fabric:${project.clothconfig_version}"
+	modImplementation "com.gitlab.Lortseam.completeconfig:base:${project.completeconfig_version}"
+	include "com.gitlab.Lortseam.completeconfig:base:${project.completeconfig_version}"
+
+	modImplementation("com.gitlab.Lortseam.completeconfig:gui-cloth:${project.completeconfig_version}")
+	include "com.gitlab.Lortseam.completeconfig:gui-cloth:${project.completeconfig_version}"
 }
 
 processResources {
