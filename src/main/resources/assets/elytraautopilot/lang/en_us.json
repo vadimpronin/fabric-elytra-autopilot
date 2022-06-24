@@ -6,6 +6,7 @@
   "config.elytraautopilot.flightprofile": "Flight Profile",
   "config.elytraautopilot.title": "Elytra AutoPilot",
   "config.elytraautopilot.gui.showgui": "Show GUI",
+  "config.elytraautopilot.gui.guiScale": "GUI Scale %",
   "config.elytraautopilot.gui.guiX": "GUI X offset",
   "config.elytraautopilot.gui.guiY": "GUI Y offset",
   "config.elytraautopilot.advanced.pullUpAngle": "Going up angle",

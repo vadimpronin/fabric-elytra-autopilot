@@ -6,6 +6,7 @@
   "config.elytraautopilot.flightprofile": "Perfil de vuelo",
   "config.elytraautopilot.title": "AutoPiloto de Élitros",
   "config.elytraautopilot.gui.showgui": "Mostrar interfaz",
+  "config.elytraautopilot.gui.guiScale": "Escala de interfaz %",
   "config.elytraautopilot.gui.guiX": "Desplazamiento en X",
   "config.elytraautopilot.gui.guiY": "Desplazamiento en Y",
   "config.elytraautopilot.advanced.pullUpAngle": "Ángulo hacia arriba",

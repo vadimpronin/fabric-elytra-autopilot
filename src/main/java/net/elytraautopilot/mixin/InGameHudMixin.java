@@ -2,6 +2,7 @@ package net.elytraautopilot.mixin;
 
 import net.elytraautopilot.ElytraAutoPilot;
 import net.elytraautopilot.config.ModConfig;
+import net.elytraautopilot.utils.Hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
@@ -12,27 +13,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InGameHud.class)
 public class InGameHudMixin {
-
-
-	MinecraftClient minecraftClient;
-	ElytraAutoPilot elytraAutoPilot;
 	@Inject(at = @At(value = "RETURN"), method = "render")
 	public void renderPost(MatrixStack matrixStack, float f, CallbackInfo ci) {
+		// TODO allow drawing on background of current screen
 		if (!ci.isCancelled()) {
-
-			if (minecraftClient == null) minecraftClient = MinecraftClient.getInstance();
-			if (elytraAutoPilot == null) elytraAutoPilot = ElytraAutoPilot.instance;
-
-			if (elytraAutoPilot.showHud) {
-
-				if (elytraAutoPilot.hudString != null) {
+			MinecraftClient minecraftClient = MinecraftClient.getInstance();
+			if (minecraftClient.currentScreen == null && ElytraAutoPilot.calculateHud) {
+				if (Hud.hudString != null) {
 					float stringX = ModConfig.gui.guiX;
 					float stringY = ModConfig.gui.guiY;
-
-					for (int i = 0; i < elytraAutoPilot.hudString.length; i++) {
-						minecraftClient.textRenderer.drawWithShadow(matrixStack, elytraAutoPilot.hudString[i], stringX, stringY, 0xFFFFFF);
+					float scale = (float) ModConfig.gui.guiScale/100;
+					matrixStack.scale(scale, scale, scale);
+					for (int i = 0; i < Hud.hudString.length; i++) {
+						minecraftClient.textRenderer.drawWithShadow(matrixStack, Hud.hudString[i], stringX, stringY, 0xFFFFFF);
 						stringY += minecraftClient.textRenderer.fontHeight + 1;
-
 					}
 				}
 			}

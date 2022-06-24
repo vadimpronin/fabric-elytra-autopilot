@@ -5,15 +5,14 @@ import me.lortseam.completeconfig.gui.ConfigScreenBuilder;
 import me.lortseam.completeconfig.gui.cloth.ClothConfigScreenBuilder;
 import net.elytraautopilot.commands.ClientCommands;
 import net.elytraautopilot.config.ModConfig;
-import net.fabricmc.api.ModInitializer;
+import net.elytraautopilot.utils.Hud;
+import net.elytraautopilot.utils.Util;
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -25,91 +24,58 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientModInitializer {
+public class ElytraAutoPilot implements ClientModInitializer {
     private static final String modid = "elytraautopilot";
-    public ElytraAutoPilot main = this;
+    private static boolean lastPressed = false;
+    public static MinecraftClient minecraftClient;
+    public static boolean calculateHud;
+    public static boolean autoFlight;
+    private static boolean startCooldown;
+    private static int cooldown = 0;
+    private static boolean onTakeoff;
+    public static double pitchMod = 1f;
 
-    private static KeyBinding keyBinding;
-    public static ElytraAutoPilot instance;
+    public static Vec3d previousPosition;
+    public static double currentVelocity;
+    public static double currentVelocityHorizontal;
 
-    private boolean lastPressed = false;
+    public static boolean isDescending;
+    public static boolean pullUp;
+    public static boolean pullDown;
 
-    public MinecraftClient minecraftClient;
+    private static double velHigh = 0f;
+    private static double velLow = 0f;
 
-    public boolean showHud;
-    public boolean autoFlight;
-
-    private boolean startCooldown;
-    private int cooldown = 0;
-
-    private boolean onTakeoff;
-    public double pitchMod = 1f;
-
-    private Vec3d previousPosition;
-    private double currentVelocity;
-    private double currentVelocityHorizontal;
-
-    public boolean isDescending;
-    public boolean pullUp;
-    public boolean pullDown;
-
-    private double velHigh = 0f;
-    private double velLow = 0f;
-
-    public int argXpos;
-    public int argZpos;
-    public boolean isChained = false;
-    public boolean isflytoActive = false;
-    public boolean forceLand = false;
-    private boolean isLanding = false;
-
-    private int _tick = 0;
-    private int _index = -1;
-    private double distance = 0f;
-    public double groundheight;
-    private List<Double> velocityList = new ArrayList<>();
-    private List<Double> velocityListHorizontal = new ArrayList<>();
-
-
-    public Text[] hudString;
+    public static int argXpos;
+    public static int argZpos;
+    public static boolean isChained = false;
+    public static boolean isflytoActive = false;
+    public static boolean forceLand = false;
+    public static boolean isLanding = false;
+    public static double distance = 0f;
+    public static double groundheight;
 
 	@Override
-	public void onInitialize() {
-        String key;
-        if (FabricLoader.getInstance().isModLoaded("cloth-config")) {
-            key = "key." + modid + ".toggle";
-        }
-        else {
-            key = "key." + modid + ".toggle_no_cloth";
-        }
+	public void onInitializeClient() {
+        minecraftClient = MinecraftClient.getInstance();
 
-	    keyBinding = new KeyBinding(
-                key, // The translation key of the keybinding's name
-                InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-                GLFW.GLFW_KEY_R, // The keycode of the key
-                "config." + modid + ".title" // The translation key of the keybinding's category.
-        );
-
-        KeyBindingHelper.registerKeyBinding(keyBinding);
-
-        lastPressed = false;
+        Util.init();
         HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> ElytraAutoPilot.this.onScreenTick());
         ClientTickEvents.END_CLIENT_TICK.register(e -> this.onClientTick());
-        ElytraAutoPilot.instance = this;
 
         ModConfig config = new ModConfig(modid);
         config.load();
         if (FabricLoader.getInstance().isModLoaded("cloth-config")) {
             ConfigScreenBuilder.setMain(modid, new ClothConfigScreenBuilder());
         }
-        initCommands();
-	}
-	public void takeoff()
+        ClientCommands.register(minecraftClient);
+    }
+
+    public static String getModId() {
+        return modid;
+    }
+	public static void takeoff()
     {
         PlayerEntity player = minecraftClient.player;
         if (!onTakeoff) {
@@ -340,7 +306,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
 
     private void onClientTick() //20 times a second, before first screen tick
     {
-        if (!(minecraftClient.isPaused() && minecraftClient.isInSingleplayer())) _tick++;
+        if (!(minecraftClient.isPaused() && minecraftClient.isInSingleplayer())) Hud.tick();
         double velMod;
 
         PlayerEntity player = minecraftClient.player;
@@ -352,9 +318,9 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
         }
 
         if (player.isFallFlying())
-            showHud = true;
+            calculateHud = true;
         else {
-            showHud = false;
+            calculateHud = false;
             autoFlight = false;
             groundheight = -1f;
         }
@@ -401,7 +367,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                 }
             }
         }
-        if(!lastPressed && keyBinding.isPressed()) {
+        if(!lastPressed && Util.keyBinding.isPressed()) {
             if (player.isFallFlying()) {
                 if (!autoFlight && groundheight < ModConfig.flightprofile.minHeight){
                     player.sendMessage(Text.translatable("text." + modid + ".autoFlightFail.tooLow").formatted(Formatting.RED), true);
@@ -423,7 +389,7 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
                 }
             }
         }
-        lastPressed = keyBinding.isPressed();
+        lastPressed = Util.keyBinding.isPressed();
 
 	    if (startCooldown) {
 	        if (cooldown < 5) cooldown++;
@@ -436,112 +402,13 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
 	    if (onTakeoff) {
             takeoff();
         }
-        if (showHud) {
+        if (calculateHud) {
             computeVelocity();
-
-            altitude = player.getPos().y;
-            double avgVelocity = 0f;
-            double avgHorizontalVelocity = 0f;
-            int gticks = Math.max(1, ModConfig.advanced.groundCheckTicks);
-            if (_tick >= gticks) {
-                _index++;
-                if (_index >= 1200/gticks) _index = 0;
-                if (velocityList.size()< 1200/gticks) {
-                    velocityList.add(currentVelocity);
-                    velocityListHorizontal.add(currentVelocityHorizontal);
-                }
-                else {
-                    velocityList.set(_index, currentVelocity);
-                    velocityListHorizontal.set(_index, currentVelocityHorizontal);
-                }
-                World world = player.world;
-                int l = world.getBottomY();
-                Vec3d clientPos = player.getPos();
-                for (double i = clientPos.getY(); i > l; i--) {
-                    BlockPos blockPos = new BlockPos(clientPos.getX(), i, clientPos.getZ());
-                    if (world.getBlockState(blockPos).isSolidBlock(world, blockPos)) {
-                        groundheight = clientPos.getY() - i;
-                        break;
-                    }
-                    else {
-                        groundheight = clientPos.getY();
-                    }
-                }
-                _tick = 0;
-            }
-            if (velocityList.size() >= 10) {
-                avgVelocity = velocityList.stream().mapToDouble(val -> val).average().orElse(0.0);
-                avgHorizontalVelocity = velocityListHorizontal.stream().mapToDouble(val -> val).average().orElse(0.0);
-            }
-            if (hudString == null) hudString = new Text[10];
-            if (!ModConfig.gui.showgui || minecraftClient.options.debugEnabled) {
-                hudString[0] = Text.of("");
-                hudString[1] = Text.of("");
-                hudString[2] = Text.of("");
-                hudString[3] = Text.of("");
-                hudString[4] = Text.of("");
-                hudString[5] = Text.of("");
-                hudString[6] = Text.of("");
-                hudString[7] = Text.of("");
-                hudString[8] = Text.of("");
-                hudString[9] = Text.of("");
-                return;
-            }
-            hudString[0] = Text.translatable("text." + modid + ".hud.toggleAutoFlight")
-                    .append(Text.translatable(autoFlight ? "text." + modid + ".hud.true" : "text." + modid + ".hud.false")
-                            .formatted(autoFlight ? Formatting.GREEN : Formatting.RED));
-
-            hudString[1] = Text.translatable("text." + modid + ".hud.altitude", String.format("%.2f", altitude))
-                    .formatted(Formatting.AQUA);
-            hudString[2] = Text.translatable("text." + modid + ".hud.heightFromGround", (groundheight == -1f ? "???" : String.valueOf(Math.round(groundheight))))
-                    .formatted(Formatting.AQUA);
-            hudString[3] = Text.translatable("text." + modid + ".hud.neededHeight")
-                    .formatted(Formatting.AQUA)
-                        .append(Text.literal(groundheight > ModConfig.flightprofile.minHeight ? "Ready" : String.valueOf(Math.round(ModConfig.flightprofile.minHeight-groundheight)))
-                            .formatted(groundheight > ModConfig.flightprofile.minHeight ? Formatting.GREEN : Formatting.RED));
-            hudString[4] = Text.translatable("text." + modid + ".hud.speed", String.format("%.2f", currentVelocity * 20))
-                    .formatted(Formatting.YELLOW);
-            if (avgVelocity == 0f) {
-                hudString[5] = Text.translatable("text." + modid + ".hud.calculating")
-                        .formatted(Formatting.WHITE);
-                hudString[6] = Text.of("");
-            }
-            else {
-                hudString[5] = Text.translatable("text." + modid + ".hud.avgSpeed", String.format("%.2f", avgVelocity * 20))
-                        .formatted(Formatting.YELLOW);
-                hudString[6] = Text.translatable("text." + modid + ".hud.avgHSpeed", String.format("%.2f", avgHorizontalVelocity * 20))
-                        .formatted(Formatting.YELLOW);
-            }
-            if (isflytoActive && !forceLand) {
-                hudString[7] = Text.translatable("text." + modid + ".flyto", argXpos, argZpos)
-                        .formatted(Formatting.LIGHT_PURPLE);
-                if (distance != 0f) {
-                    hudString[8] = Text.translatable("text." + modid + ".hud.eta", String.valueOf(Math.round(distance/(avgHorizontalVelocity * 20))))
-                            .formatted(Formatting.LIGHT_PURPLE);
-                }
-                hudString[9] = Text.translatable("text." + modid + ".hud.autoLand")
-                        .formatted(Formatting.LIGHT_PURPLE)
-                            .append(Text.translatable(ModConfig.flightprofile.autoLanding ? "text." + modid + ".hud.enabled" : "text." + modid + ".hud.disabled")
-                                .formatted(ModConfig.flightprofile.autoLanding ? Formatting.GREEN : Formatting.RED));
-                if (isLanding) {
-                    hudString[8] = Text.translatable("text." + modid + ".hud.landing")
-                            .formatted(Formatting.LIGHT_PURPLE);
-                }
-            }
-            else {
-                hudString[7] = Text.of("");
-                hudString[8] = Text.of("");
-                hudString[9] = Text.of("");
-            }
-            if (forceLand) {
-                hudString[7] = Text.translatable("text." + modid + ".hud.landing")
-                        .formatted(Formatting.LIGHT_PURPLE);
-            }
+            Hud.drawHud(player);
         }
         else {
-            velocityList.clear();
-            velocityListHorizontal.clear();
             previousPosition = null;
+            Hud.clearHud();
         }
     }
 
@@ -560,14 +427,6 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
 
             currentVelocity = difference.length();
             currentVelocityHorizontal = difference_horizontal.length();
-        }
-    }
-
-    private void initCommands()
-    {
-        if (minecraftClient == null) {
-            minecraftClient = MinecraftClient.getInstance();
-            ClientCommands.register(main, minecraftClient);
         }
     }
 
@@ -603,8 +462,4 @@ public class ElytraAutoPilot implements ModInitializer, net.fabricmc.api.ClientM
         pitch = player.getPitch();
         if (pitch > 90f) player.setPitch(90f);
     }
-	@Override
-	public void onInitializeClient() {
-        System.out.println("Client ElytraAutoPilot active");
-	}
 }

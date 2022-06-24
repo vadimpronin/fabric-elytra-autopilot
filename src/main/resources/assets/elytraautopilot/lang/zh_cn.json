@@ -6,6 +6,7 @@
   "config.elytraautopilot.flightprofile": "飞行配置",
   "config.elytraautopilot.title": "自动化鞘翅飞行",
   "config.elytraautopilot.gui.showgui": "显示GUI",
+  "config.elytraautopilot.gui.guiScale": "GUI 规模 %",
   "config.elytraautopilot.gui.guiX": "GUI X 坐标",
   "config.elytraautopilot.gui.guiY": "GUI Y 坐标",
   "config.elytraautopilot.advanced.pullUpAngle": "爬升角度",

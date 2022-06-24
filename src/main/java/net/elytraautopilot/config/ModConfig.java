@@ -16,6 +16,9 @@ public class ModConfig extends Config {
     @ConfigEntries(includeAll = true)
     public static class gui implements ConfigGroup {
         public static boolean showgui = true;
+        @ConfigEntry.Slider
+        @ConfigEntry.BoundedInteger(min = 0, max = 300)
+        public static int guiScale = 100;
         public static int guiX = 5;
         public static int guiY = 5;
     }
@@ -43,6 +46,7 @@ public class ModConfig extends Config {
     @Transitive
     @ConfigEntries(includeAll = true)
     public static class advanced implements ConfigGroup {
+
         @ConfigEntry.Slider
         @ConfigEntry.BoundedInteger(min = 1, max = 20)
         public static int groundCheckTicks = 4;
