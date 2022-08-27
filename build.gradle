@@ -1,6 +1,8 @@
+//file:noinspection GroovyUnusedAssignment
 plugins {
 	id 'fabric-loom' version '0.12-SNAPSHOT'
 	id 'maven-publish'
+	id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -23,10 +25,11 @@ repositories {
 	maven {
 		url "https://maven.siphalor.de/"
 	}
+	mavenCentral()
 }
 
 dependencies {
-	implementation 'org.projectlombok:lombok:1.18.22'
+	implementation 'org.projectlombok:lombok:1.18.24'
 
 	//to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -96,5 +99,29 @@ publishing {
 	repositories {
 		// uncomment to publish to the local maven
 		// mavenLocal()
+	}
+}
+
+curseforge {
+	if (System.getenv('CURSEFORGE_TOKEN') != null) {
+		apiKey = System.getenv('CURSEFORGE_TOKEN')
+	} else {
+		apiKey = "DUMMY"
+	}
+	project {
+		id = '498496'
+		changelog = 'Just about everything!'
+		releaseType = 'release'
+		addGameVersion '1.19.1'
+		addGameVersion '1.19.2'
+
+		mainArtifact(remapJar) {
+			displayName = "Elytra AutoPilot 2.0.0"
+			relations {
+				requiredDependency 'fabric-api'
+				optionalDependency 'cloth-config'
+				optionalDependency 'modmenu'
+			}
+		}
 	}
 }

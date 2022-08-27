@@ -50,5 +50,14 @@
   "text.elytraautopilot.hud.autoLand": "Auto aterrizaje : ",
   "text.elytraautopilot.hud.enabled": "Activado",
   "text.elytraautopilot.hud.disabled": "Desactivado",
-  "text.elytraautopilot.hud.landing": "Aterrizando..."
+  "text.elytraautopilot.hud.landing": "Aterrizando...",
+  "key.elytraautopilot.land": "Aterrizaje Forzoso",
+  "key.elytraautopilot.takeoff": "Despegar / Abortar",
+  "config.elytraautopilot.advanced.flyLocations": "Lugar de Vuelo",
+  "config.elytraautopilot.flightprofile.playSoundOnLanding": "Sonido al aterrizar",
+  "text.elytraautopilot.landing": "¡Aterrizando!",
+  "text.elytraautopilot.flylocation.saved": "Guardado lugar \"%s\" en X: %d, Z: %d",
+  "text.elytraautopilot.flylocationFail.nameExists": "¡Este nombre de lugar ya existe!",
+  "text.elytraautopilot.flylocationFail.notFound": "¡Lugar \"%s\" no existe!",
+  "text.elytraautopilot.flylocation.removed": "Eliminado lugar \"%s\""
 }
