@@ -12,7 +12,6 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import static java.lang.Integer.parseInt;
 
@@ -200,7 +199,7 @@ public class ClientCommands {
                             ClientPlayerEntity player = minecraftClient.player;
                             if (player == null) return 0;
                             player.sendMessage(Text.translatable("text.elytraautopilot.landing").formatted(Formatting.BLUE), true);
-                            SoundEvent soundEvent = Registry.SOUND_EVENT.get(new Identifier(ModConfig.flightprofile.playSoundOnLanding));
+                            SoundEvent soundEvent = SoundEvent.of(new Identifier(ModConfig.flightprofile.playSoundOnLanding));
                             player.playSound(soundEvent, 1.3f, 1f);
                             minecraftClient.options.useKey.setPressed(false);
                             ElytraAutoPilot.forceLand = true;

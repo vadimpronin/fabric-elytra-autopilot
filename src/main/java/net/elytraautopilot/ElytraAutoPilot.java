@@ -26,7 +26,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -232,7 +231,7 @@ public class ElytraAutoPilot implements ClientModInitializer {
                     distance = Math.sqrt(f * f + d * d);
                     if (distance < 20) {
                         minecraftClient.player.sendMessage(Text.translatable("text.elytraautopilot.landing").formatted(Formatting.BLUE), true);
-                        SoundEvent soundEvent = Registry.SOUND_EVENT.get(new Identifier(ModConfig.flightprofile.playSoundOnLanding));
+                        SoundEvent soundEvent = SoundEvent.of(new Identifier(ModConfig.flightprofile.playSoundOnLanding));
                         player.playSound(soundEvent, 1.3f, 1f);
                         isLanding = true;
                     }
@@ -392,7 +391,7 @@ public class ElytraAutoPilot implements ClientModInitializer {
 
         if (!landPressed && KeyBindings.landBinding.isPressed() && autoFlight) {
             player.sendMessage(Text.translatable("text.elytraautopilot.landing").formatted(Formatting.BLUE), true);
-            SoundEvent soundEvent = Registry.SOUND_EVENT.get(new Identifier(ModConfig.flightprofile.playSoundOnLanding));
+            SoundEvent soundEvent = SoundEvent.of(new Identifier(ModConfig.flightprofile.playSoundOnLanding));
             player.playSound(soundEvent, 1.3f, 1f);
             minecraftClient.options.useKey.setPressed(false);
             forceLand = true;
