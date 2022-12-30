@@ -41,10 +41,11 @@ public class ModConfig extends Config {
         public static double turningSpeed = 3;
         public static double takeOffPull = 10;
         public static boolean riskyLanding = false;
-        public static boolean poweredFlight = false;
         public static boolean elytraHotswap = true;
         public static boolean fireworkHotswap = true;
         public static boolean emergencyLand = true;
+
+        public static int flightMode = 1;
     }
 
     @Transitive
